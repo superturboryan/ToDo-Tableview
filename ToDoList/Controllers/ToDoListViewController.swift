@@ -31,11 +31,8 @@ class ToDoListViewController: UIViewController, UITableViewDataSource, UITableVi
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTapped))
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(editTapped))
-
         
-        let testItem = toDoItem(name: "Gym", details: "Friday am w/ Philippe", completionDate: Date())
-        
-        self.toDoItemsList.append(testItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(addNewTask(_ :)), name: NSNotification.Name.init("com.todolistapp.addTask"), object: nil)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -49,6 +46,35 @@ class ToDoListViewController: UIViewController, UITableViewDataSource, UITableVi
         performSegue(withIdentifier: "goToAddTask", sender: nil)
         
     }
+    
+    @objc func addNewTask(_ notification : NSNotification) {
+        
+        var toDoItem : toDoItem!
+        
+        if let task = notification.object as? toDoItem {
+            
+            toDoItem = task
+        }
+        else if let taskDict = notification.userInfo as NSDictionary? {
+            
+            guard let task = taskDict["Task"] as? toDoItem else {return}
+            
+            toDoItem = task
+            
+        }
+        else {
+            return
+        }
+        
+        toDoItemsList.append(toDoItem)
+        
+        toDoItemsList.sort(by: {$0.completionDate > $1.completionDate})
+        
+        tableView.reloadData()
+    }
+    
+    
+    
     
     @objc func editTapped() {
         
@@ -123,6 +149,12 @@ class ToDoListViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         
     }
+    
+    deinit {
+        
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.init("com.todolistapp.addTask"), object: nil)
+    }
+    
 }
 
 extension ToDoListViewController: ToDoListDelegate {

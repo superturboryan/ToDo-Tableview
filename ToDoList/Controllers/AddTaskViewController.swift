@@ -175,7 +175,56 @@ class AddTaskViewController: UIViewController {
     
     @IBAction func addTaskDidTouch(_ sender: Any) {
         
+        guard let newTaskName = taskNameTextField.text, !newTaskName.isEmpty else {
+            
+            reportError(title: "Invalid task name", message: "Task name is required")
+            
+            return
+        }
         
+        if newTaskName.count > 50 {
+            reportError(title: "Invalid task name", message: "Cannot be longer than 50 characters")
+            return
+        }
+
+        if taskDetailsTextView.text.isEmpty {
+            
+            reportError(title: "Invalid task details", message: "Task details are required")
+            
+            return
+        }
+        
+        let completionDate : Date = taskCompletionDatePicker.date
+        
+        if completionDate < Date() {
+            
+            reportError(title: "Invalid completion date", message: "You cannot complete a task in the past... \nOr can you?")
+            
+            return
+        }
+        
+        let newTask = toDoItem(name: newTaskName, details: taskDetailsTextView.text, completionDate: taskCompletionDatePicker.date)
+        
+        let toDoDict : [String : toDoItem] = ["Task" : newTask]
+
+//      NotificationCenter.default.post(name: NSNotification.Name.init("com.todolistapp.addTask"), object: newTask)
+        
+        NotificationCenter.default.post(name: NSNotification.Name.init("com.todolistapp.addTask"), object: nil, userInfo: toDoDict)
+        
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func reportError(title : String, message : String) {
+        
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        
+        let okAction = UIAlertAction(title: "OK", style: .default) { (action) in
+            alert.dismiss(animated: true, completion: nil)
+        }
+        
+        alert.addAction(okAction)
+        
+        present(alert, animated: true, completion: nil)
         
     }
 
