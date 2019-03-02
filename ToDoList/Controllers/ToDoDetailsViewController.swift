@@ -26,7 +26,7 @@ class ToDoDetailsViewController: UIViewController {
     
     @IBOutlet weak var taskCompletionDate: UILabel!
 
-    var toDoItem : toDoItem!
+    var toDoItem : Task!
     var toDoIndex : Int!
     
     //Delegates must be optional!
@@ -34,7 +34,7 @@ class ToDoDetailsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         taskTitleLabel.text = toDoItem.name
         
         taskDetailsTextView.text = toDoItem.details
@@ -45,9 +45,9 @@ class ToDoDetailsViewController: UIViewController {
         
         let formatter = DateFormatter()
         
-        formatter.dateFormat = "MMM dd, yyyy hh:mm"
+        formatter.dateFormat = "dd MMM, yyyy hh:mm"
         
-        let taskDate = formatter.string(from: toDoItem.completionDate)
+        let taskDate = formatter.string(from: toDoItem.completionDate as Date)
         
         taskCompletionDate.text = taskDate
     }
@@ -56,9 +56,23 @@ class ToDoDetailsViewController: UIViewController {
     
     @IBAction func taskDidComplete(_ sender: Any) {
         
-        toDoItem.isComplete = true
+        //toDoItem.isComplete = true
         
-        delegate?.update(task: toDoItem, index: toDoIndex)
+        guard let realm = LocalDatabaseManager.realm else{
+            return
+        }
+        
+        do{
+            try realm.write{
+                toDoItem.isComplete = true
+            }
+        }
+        catch let error as NSError{
+            print(error.localizedDescription)
+            return
+        }
+        
+        delegate?.update()
         
         disableButton()
     }

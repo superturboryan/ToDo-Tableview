@@ -203,13 +203,42 @@ class AddTaskViewController: UIViewController {
             return
         }
         
-        let newTask = toDoItem(name: newTaskName, details: taskDetailsTextView.text, completionDate: taskCompletionDatePicker.date)
+        guard let realm = LocalDatabaseManager.realm else {
+            reportError(title: "Error", message: "A new task could not be created")
+            return
+        }
         
-        let toDoDict : [String : toDoItem] = ["Task" : newTask]
+        let nextTaskId = (realm.objects(Task.self).max(ofProperty: "id") as Int? ?? 0) + 1
+        
+        let newTask = Task()
+        
+        newTask.id = nextTaskId
+        newTask.name = newTaskName
+        newTask.details = taskDetailsTextView.text
+        
+        newTask.completionDate = completionDate as NSDate
+        
+        newTask.isComplete = false
+        
+        do {
+            
+            try realm.write {
+                realm.add(newTask)
+            }
+        }
+        catch let error as NSError {
+            print(error.localizedDescription)
+            
+            reportError(title: "Error", message: "New task could not be created")
+        }
+        
+//        let newTask = toDoItem(name: newTaskName, details: taskDetailsTextView.text, completionDate: taskCompletionDatePicker.date)
+//
+//        let toDoDict : [String : toDoItem] = ["Task" : newTask]
 
 //      NotificationCenter.default.post(name: NSNotification.Name.init("com.todolistapp.addTask"), object: newTask)
         
-        NotificationCenter.default.post(name: NSNotification.Name.init("com.todolistapp.addTask"), object: nil, userInfo: toDoDict)
+        NotificationCenter.default.post(name: NSNotification.Name.init("com.todolistapp.addTask"), object: nil, userInfo: nil)
         
         dismiss(animated: true, completion: nil)
     }
