@@ -1,6 +1,6 @@
-![alt text](https://github.com/superturboryan/ToDo-Tableview/blob/master/ToDoList/Supporting%20Files/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60%403x.png "App Icon")
-
 ## To-Do List App
+
+![alt text](https://github.com/superturboryan/ToDo-Tableview/blob/master/ToDoList/Supporting%20Files/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60%403x.png "App Icon")
 
 This is a basic to-do list to help you organize your everyday tasks.
 
